@@ -1,2 +1,2 @@
 ﻿  C#_JS_Translator.cpp
-  C#_JS_Translator.vcxproj -> C:\Users\Alex\source\repos\C#_JS_Translator\x64\Debug\C#_JS_Translator.exe
+C:\Users\Alex\source\repos\C#_JS_Translator\C#_JS_Translator\C#_JS_Translator.cpp(31): error C4716: number_id: должна возвращать значение

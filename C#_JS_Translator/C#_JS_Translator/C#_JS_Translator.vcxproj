@@ -130,7 +130,9 @@
     <ClCompile Include="C#_JS_Translator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="Identificators.txt" />
     <Text Include="Operations.txt" />
+    <Text Include="Result.txt" />
     <Text Include="Separators.txt" />
     <Text Include="SystemWord.txt" />
   </ItemGroup>
