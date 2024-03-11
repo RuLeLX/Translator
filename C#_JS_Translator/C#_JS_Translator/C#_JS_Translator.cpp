@@ -15,25 +15,6 @@ using namespace std;
 */
 
 //Возвращает порядковый номер идентификатора в базе идентификаторов + подходит для баз прочих лексем
-int number_id(string identificators, string buffer) {
-
-    string id = "";
-    vector<string> list_id;
-
-    //строка идентификаторов превращается в вектор
-    for (int i = 0; i < identificators.length(); i++) {
-        if (identificators[i] != ' ') id += identificators[i];
-        else {
-            list_id.push_back(id);
-            id = "";
-        }
-    }
-
-    for (int i = 0; i < list_id.size(); i++) {
-        if (list_id[i] == buffer) return i;
-    }
-  
-}
 
 void ChangeState(char &symbol,  unsigned char &state, unsigned char &pred_state) {
     //Возможные значения state: S, F, Z, 1...10(схему смотри) + 11 вспомогательное
@@ -47,154 +28,82 @@ void ChangeState(char &symbol,  unsigned char &state, unsigned char &pred_state)
     switch (state) {
         case 'S':
             pred_state = 'S';
-            if (litters.find(symbol) != string::npos) state = 1;
-
-            else if (symbol >= '0' && symbol <= '9') state = 3;
-
-            else if (symbol == '.') state = 4;
-
-            else if (symbol == '/') state = 6;
-
-            else if (operations.find(symbol) != string::npos) state = 9;
-
-            else if (separators.find(symbol) != string::npos) state = 'S';
+            
             break;
 
         case 1:
             pred_state = 1;
-            if (litters.find(symbol) != string::npos) state = 1;
-
-            else if (symbol >= '0' && symbol <= '9') state = 2;
-
-            else if (operations.find(symbol) != string::npos || separators.find(symbol) != string::npos) state = 'S';
+            
             break;
 
         case 2:
             pred_state = 2;
-            if (litters.find(symbol) != string::npos || (symbol >= '0' && symbol <= '9')) state = 2;
-
-            else if (operations.find(symbol) != string::npos || separators.find(symbol) != string::npos) state = 'S';
+           
             break;
         
         case 3:
             pred_state = 3;
-            if (symbol >= '0' && symbol <= '9') state = 3;
-
-            else if (symbol == '.') state = 5;
-
-            else if (operations.find(symbol) != string::npos || separators.find(symbol) != string::npos) state = 'S';
+           
             break;
 
         case 4:
             pred_state = 4;
 
-            if (symbol >= '0' && symbol <= '9') state = 5;
-
-            else if (operations.find(symbol) != string::npos || separators.find(symbol) != string::npos) state = 'S';
             break;
 
         case 5:
             pred_state = 5;
 
-            if (symbol >= '0' && symbol <= '9') state = 5;
-
-            else if (operations.find(symbol) != string::npos || separators.find(symbol) != string::npos) state = 'S';
+  
             break;
 
         case 6:
             pred_state = 6;
 
-            if (symbol == '/') state = 7;
-
-            if (symbol == '=') state = 9;
             break;
 
         case 7:
             pred_state = 7;
 
-            if (symbol != ' ') state = 7;
-            else state = 'S';
             break;
 
         case 9:
             pred_state = 9;
 
-            if (operations.find(symbol) != string::npos) state = 11;
-            else state = 'F';
             break;
 
         case 11:
             pred_state = 11;
 
-            if (operations.find(symbol) != string::npos) state = 'S';
-            else state = 'F';
             break;
     }
 }
 
 int count_id = 0; //Числовая часть внутреннего представления идентификатра
 void Semantic_procedure_1(string &buffer, string &identificators, string &result) {
-    if (identificators.find(buffer) == std::string::npos) {
-        identificators += buffer + ' ';
-
-        //база идентификаторов
-        ofstream f("Identificators.txt");
-        f << identificators << endl;
-        f.close();
-
-        result += " I" + to_string(count_id++);
-        ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
-        res << result;
-    } else {
-        //база идентификаторов представлена строкой
-        result += " I" + to_string(number_id(identificators, buffer));
-        ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
-        res << result;
-
-    }
-    buffer = "";
+    
 }
 
 void Semantic_procedure_2(string &buffer, string SystemWordBase, string &identificators, string &result) {
-    if (SystemWordBase.find(buffer) == std::string::npos) Semantic_procedure_1(buffer, identificators, result);
     
-    else {
-        result += " W" + to_string(number_id(SystemWordBase, buffer));
-        ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
-        res << result;
-    }
-    buffer = "";
 }
 
-int count_const = 0;
-void Semantic_procedure_3(string &buffer, string &constants, string &result) {   
-    constants += buffer + ' ';
+void Semantic_procedure_3(string& buffer, string Operations, string& result) {
 
-    //база констант
-    ofstream f("Constants.txt");
-    f << constants;
-
-    result += " N" + to_string(count_const++);
-    ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
-    res << result;
-    buffer = "";
 }
 
-void Semantic_procedure_9(string &buffer, string Separators, string& result) {
-    result += " R" + to_string(number_id(Separators, buffer));
-    ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
-    res << result;
-    buffer = "";
+void Semantic_procedure_4(string &buffer, string Separators, string& result) {
+  
 }
 
-//В 5 семантической процедуре нет смысла, т.к комментарии отбрасываются
+void Semantic_procedure_5() {
 
-void Semantic_procedure_6(string &buffer, string Operations, string& result) {
-    result += " O" + to_string(number_id(Operations, buffer));
-    ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
-    res << result;
-    buffer = "";
 }
+
+void Semantic_procedure_6() {
+
+}
+
 
 int main()
 {
@@ -312,4 +221,5 @@ int main()
             }   
         }   
     }
+
 }
