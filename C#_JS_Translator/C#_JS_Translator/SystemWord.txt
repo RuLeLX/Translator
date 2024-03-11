@@ -11,6 +11,8 @@ checked
 class
 const
 continue
+Console
+Convert
 decimal
 default
 delegate
@@ -51,6 +53,8 @@ public
 readonly
 ref
 return
+Read
+ReadLine
 sbyte
 sealed
 short
@@ -60,11 +64,13 @@ static
 string
 struct
 switch
+System
 this
 throw
 true
 try
 typeof
+ToDouble
 uint
 ulong
 unchecked
@@ -75,3 +81,5 @@ virtual
 void
 volatile
 while
+Write
+WriteLine

@@ -14,20 +14,25 @@ using namespace std;
     Константы символьные С
 */
 
-//Возвращает порядковый номер идентификатора в базе идентификаторов
-int number_id(string identificators) {
+//Возвращает порядковый номер идентификатора в базе идентификаторов + подходит для баз прочих лексем
+int number_id(string identificators, string buffer) {
 
     string id = "";
     vector<string> list_id;
 
+    //строка идентификаторов превращается в вектор
     for (int i = 0; i < identificators.length(); i++) {
         if (identificators[i] != ' ') id += identificators[i];
         else {
-
+            list_id.push_back(id);
+            id = "";
         }
     }
-   
 
+    for (int i = 0; i < list_id.size(); i++) {
+        if (list_id[i] == buffer) return i;
+    }
+  
 }
 
 void ChangeState(char &symbol,  unsigned char &state, unsigned char &pred_state) {
@@ -128,9 +133,9 @@ void ChangeState(char &symbol,  unsigned char &state, unsigned char &pred_state)
 }
 
 int count_id = 0; //Числовая часть внутреннего представления идентификатра
-void Semantic_procedure_1(string buffer, string &identificators, string &result) {
+void Semantic_procedure_1(string &buffer, string &identificators, string &result) {
     if (identificators.find(buffer) == std::string::npos) {
-        identificators += ' ' + buffer;
+        identificators += buffer + ' ';
 
         //база идентификаторов
         ofstream f("Identificators.txt");
@@ -141,18 +146,54 @@ void Semantic_procedure_1(string buffer, string &identificators, string &result)
         ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
         res << result;
     } else {
-        //база идентификаторов представлена строкой, преобразуем её в вектор??
-
-
-        //Находим номер идентификатора в базе идентификаторов
-
+        //база идентификаторов представлена строкой
+        result += " I" + to_string(number_id(identificators, buffer));
+        ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
+        res << result;
 
     }
+    buffer = "";
 }
 
-int count_system_word = 0;
-void Semantic_procedure_2() {
+void Semantic_procedure_2(string &buffer, string SystemWordBase, string &identificators, string &result) {
+    if (SystemWordBase.find(buffer) == std::string::npos) Semantic_procedure_1(buffer, identificators, result);
+    
+    else {
+        result += " W" + to_string(number_id(SystemWordBase, buffer));
+        ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
+        res << result;
+    }
+    buffer = "";
+}
 
+int count_const = 0;
+void Semantic_procedure_3(string &buffer, string &constants, string &result) {   
+    constants += buffer + ' ';
+
+    //база констант
+    ofstream f("Constants.txt");
+    f << constants;
+
+    result += " N" + to_string(count_const++);
+    ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
+    res << result;
+    buffer = "";
+}
+
+void Semantic_procedure_9(string &buffer, string Separators, string& result) {
+    result += " R" + to_string(number_id(Separators, buffer));
+    ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
+    res << result;
+    buffer = "";
+}
+
+//В 5 семантической процедуре нет смысла, т.к комментарии отбрасываются
+
+void Semantic_procedure_6(string &buffer, string Operations, string& result) {
+    result += " O" + to_string(number_id(Operations, buffer));
+    ofstream res("Result.txt"); //файл лексем программы С# во внутреннем представлении
+    res << result;
+    buffer = "";
 }
 
 int main()
@@ -210,6 +251,8 @@ int main()
     //Формируем базу идентификитаров
     string identificators = "";
 
+    //Формируем базу констант
+    string constants = "";
 
     //Внутренне представление лексем
     string result = "";
@@ -237,10 +280,36 @@ int main()
         ChangeState(program_tokens[i], state, pred_state);
         buffer += program_tokens[i];
 
-        
-        
+        if (state == 'S') {
+            switch (pred_state) {
+                case 1:
+                    Semantic_procedure_2(buffer, SystemWordBase, identificators, result);
+                    break;
+
+                case 2:
+                    Semantic_procedure_1(buffer, identificators, result);
+                    break;
+
+                case 3:
+                    Semantic_procedure_3(buffer, constants, result);
+                    break;
+                
+                case 4:
+                    Semantic_procedure_9(buffer, Separators, result);
+                    break;
+
+                case 5:
+                    Semantic_procedure_3(buffer, constants, result);
+                    break;
+                
+                case 11:
+                    Semantic_procedure_6(buffer, Operations, result);
+                    break;
+
+                case 'S':
+                    Semantic_procedure_9(buffer, Separators, result);
+                    break;
+            }   
+        }   
     }
-
-    
-
 }
